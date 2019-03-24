@@ -149,11 +149,13 @@ def Network_train(Possible_Features):
                 FeatureOutputs[ListItem][Index] = 1
                 ListItem+=1
             except:
-                #print("FAILED")
                 continue
 
-    FeatureOutputs=np.array([FeatureOutputs[Item] for Item in range(DataLen) if np.sum(FeatureInputs[Item]) > 255*StandardDefault.MinPixels]) # NEW FUNCTION
-    FeatureInputs=np.array([FeatureInputs[Item] for Item in range(DataLen) if np.sum(FeatureInputs[Item]) > 255*StandardDefault.MinPixels])
+    FeatureOutputs=np.array([FeatureOutputs[Item] for Item in range(DataLen) 
+        if np.sum(FeatureInputs[Item]) > 255*StandardDefault.MinPixels])
+
+    FeatureInputs=np.array([FeatureInputs[Item] for Item in range(DataLen) 
+        if np.sum(FeatureInputs[Item]) > 255*StandardDefault.MinPixels])
 
     InputLayer = Input(shape=(StandardDefault.ImageSize**2,), name='InputLayer')
     ReshapeLayer = Reshape((StandardDefault.ImageSize, StandardDefault.ImageSize, 1), name='ReshapeLayer')(InputLayer)
@@ -254,7 +256,8 @@ def CollectImages(searchtext, num_requested):
                     print('Writing File...')
                     File = Image.open(File)
                     if File.size[0] < File.size[1]:
-                        Imges_saved.append(Read(File, ScreenSize=StandardDefault.ScreenSize, PositionList=StandardDefault.Empty()))
+                        Imges_saved.append(Read(File, ScreenSize=StandardDefault.ScreenSize, 
+                                                        PositionList=StandardDefault.Empty()))
                         File.close()
             elif img_file.status_code == 200 and searchtext != 'Front_View_Face_Drawing':
                 with open("File_"+str(img_count)+searchtext+".jpg", 'wb') as File:
@@ -363,10 +366,14 @@ if __name__ == "__main__":
 
         FeatureNeighborList = [FeatureNeighborList[Iteration*Index:(Iteration*Index)+Iteration] for Index in range(len(FeatureNeighborList)/Iteration)][0]
         FeatureNeighborList = [[Item/Set[0] if Set[0] and Item != None else Item for Item in Set] for Set in FeatureNeighborList]
-        AvgFeatureList = [sum([FeatureNeighborList[Index][Item] for Index in range(len(FeatureNeighborList)) if FeatureNeighborList[Index][Item] != None])/len(FeatureNeighborList) for Item in range(len(FeatureNeighborList))]
+        AvgFeatureList = [sum([FeatureNeighborList[Index][Item] for Index in range(len(FeatureNeighborList)) 
+            if FeatureNeighborList[Index][Item] != None])/len(FeatureNeighborList) for Item in range(Iteration)]
+
         UnitDrawnNeighborList = [Item/DrawnNeighborList[0] if DrawnNeighborList[0] and Item != None else Item for Item in DrawnNeighborList]
         
-        CorrectionList = [float(DrawnNeighborList[0]*(AvgFeatureList[0]-UnitDrawnNeighborList[0])) if AvgFeatureList[Index] and DrawnNeighborList[Index] != None else 0 for Index in range(StandardDefault.Expand(StandardDefault.SearchFeatures))]
+        CorrectionList = [float(DrawnNeighborList[0]*(AvgFeatureList[0]-UnitDrawnNeighborList[0])) 
+            if AvgFeatureList[Index] and DrawnNeighborList[Index] != None else 0 for Index in range(Iteration)]
+            
         print('Here are some corrections you may love! List suggests changes in this order: \
             Distance Between Eyes, Distance Between First Eye and Nose, Distance Between First Eye and Mouth, Distance Between \
             Second Eye and Nose, Distance Between Second Eye and Mouth' + str(CorrectionList))
